@@ -1,53 +1,49 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
-#define maxtam 100
+#define tam 100
 
-void mesclarArquivos(const char *arq1, const char *arq2, const char *arq3){
+void preencher(char str1[],char str2[]){
+    printf("Digite uma palavra: ");
+    fgets(str1, tam, stdin);
 
-    FILE *arquivo1 = fopen(arq1, "r");
-    FILE *arquivo2 = fopen(arq2, "r");
-    FILE *arquivoResultado = fopen(arq3, "w");
-
-    if (arquivo1 == NULL || arquivo2 == NULL || arquivoResultado == NULL) {
-        printf("Erro ao abrir os arquivos.\n");
-        exit(1);
-    }
-
-    char linha1[maxtam], linha2[maxtam];
-
-    while(fgets(linha1, maxtam, arquivo1) != NULL || fgets(linha2, maxtam, arquivo2) != NULL){ //Enquanto não chegar ao final dos arquivos
-        if(linha1[0] != '\0'){
-            fprintf(arquivoResultado, "%s", linha1);
-        }
-        if(linha2[0] != '\0'){
-            fprintf(arquivoResultado, "%s", linha2);
-        }
-    }
-
-    fclose(arquivo1);
-    fclose(arquivo2);
-    fclose(arquivoResultado);
+    printf("Digite uma segunda palavra: ");
+    fgets(str2, tam, stdin);  
 }
 
 int main(){
 
-    char arquivo1[maxtam];
-    char arquivo2[maxtam];
-    char arquivo3[maxtam];
+    FILE *arq;
+    char p1[tam], p2[tam], cat[tam];
+    
+    preencher(p1, p2);
 
-    printf("Digite o nome do primeiro arquivo: ");
-    scanf("%s", arquivo1);
+    arq = fopen("arq1.txt","w");
+    
+    fputs(p1,arq);
 
-    printf("Digite o nome do segundo arquivo: ");
-    scanf("%s", arquivo2);
+    fclose(arq);
 
-    printf("Digite o nome do arquivo resultado: ");
-    scanf("%s", arquivo3);
+    arq = fopen("arq2.txt","w");
 
-    mesclarArquivos(arquivo1, arquivo2, arquivo3);
+    fputs(p2,arq);
+    
+    fclose(arq);
 
-    printf("Arquivos mesclados com sucesso!\n");
+    arq = fopen("arq3.txt","w");
+    
+    sprintf(cat,"%s%s",p1,p2);
+    fputs(cat,arq);
+
+    fclose(arq);
+
+    arq = fopen("arq3.txt","r");
+
+    while(fgets(cat,tam,arq) != NULL){
+        printf("%s",cat);
+    }
+
+    fclose(arq);
 
     return 0;
 }
