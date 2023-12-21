@@ -3,67 +3,95 @@
 #include <string.h>
 #include <time.h>
 
-#define maxtam 100
-#define tamdata 11
+#define tam 100
 
-typedef struct {
-    char nome[maxtam];
-    char nascimento[tamdata];
-} Pessoa;
+void preencher(char nome[],int *ano,int *mes,int *dia){
 
-void calc(const char *nascimento, char *idade){
+    printf("Informe o seu nome: ");
+    gets(nome);
 
-    time_t t = time(NULL);
-    
-    struct tm tmAtual = *localtime(&t);
-    
-    int diaNasc, mesnasc, anonasc;
-    sscanf(nascimento, "%d/%d/%d", &diaNasc, &mesnasc, &anonasc);
-
-    int idadeemanos = tmAtual.tm_year + 1900 - anonasc;
-
-    if(tmAtual.tm_mon + 1 < mesnasc || (tmAtual.tm_mon + 1 == mesnasc && tmAtual.tm_mday < diaNasc)){
-        idadeemanos--;
-    }
-
-    sprintf(idade, "%d", idadeemanos);
+    printf("Informe a sua data de nascimento (dia/mes/ano): ");
+    scanf("%d %d %d", dia, mes, ano);
 }
 
-void idade(const char *arqe, const char *arqs){
+void nomedata(char nome[],int ano,int mes,int dia){
+    FILE *arq;
+    arq = fopen("nomedata.txt","a");
+    
+    fprintf(arq,"%s %02d/%02d/%04d",nome,dia,mes,ano);
 
-    FILE *arquivoEntrada = fopen(arqe, "r");
-    FILE *arquivoSaida = fopen(arqs, "w");
+    fclose(arq);
+}
 
-    if(arquivoEntrada == NULL || arquivoSaida == NULL){
-        printf("Erro ao abrir os arquivos.\n");
-        exit(EXIT_FAILURE);
+void nomeidade(char nome[],int idade){
+    FILE *arq;
+    arq = fopen("nomeIdade.txt","a");
+    
+    fprintf(arq,"%s %02d",nome,idade);
+
+    fclose(arq);
+}
+
+int calcidade(char hoje[],int ano,int mes,int dia){
+
+    int dataHj = atoi(hoje), dataNasc, anodeidade;
+    char nasc[8];
+    
+    sprintf(nasc,"%04d%02d%02d",ano,mes,dia);
+    dataNasc = atoi(nasc);
+
+    anodeidade = dataHj - dataNasc;
+
+    return anodeidade/10000; 
+}
+
+void leitura(){
+
+    FILE *arq;
+    char c;
+    arq = fopen("nomedata.txt","r");
+
+    printf("Primeiro arquivo\n");
+    while(!(feof(arq))){
+        c = fgetc(arq);
+        printf("%c", c);
     }
 
-    Pessoa pessoa;
+    fclose(arq);
 
-    while(fscanf(arquivoEntrada, "%s %s", pessoa.nome, pessoa.nascimento) == 2){
-        char idade[tamdata];
-        calc(pessoa.nascimento, idade);
-        fprintf(arquivoSaida, "%s %s\n", pessoa.nome, idade);
+    printf("\nSegundo arquivo\n");
+    arq = fopen("nomeIdade.txt","r");
+
+    while(!(feof(arq))){
+        c = fgetc(arq);
+        printf("%c", c);
     }
 
-    fclose(arquivoEntrada);
-    fclose(arquivoSaida);
+    fclose(arq);
 }
 
 int main(){
-    char nomeArquivoEntrada[maxtam];
-    char nomeArquivoSaida[maxtam];
 
-    printf("Digite o nome do arquivo de entrada: ");
-    scanf("%s", nomeArquivoEntrada);
+    char nome[tam], hoje[8];
+    int ano, mes, dia, idade;
+    
+    time_t mytime;
+    mytime = time(NULL);
 
-    printf("Digite o nome do arquivo de saída: ");
-    scanf("%s", nomeArquivoSaida);
+    struct tm tm = *localtime(&mytime);
 
-    idade(nomeArquivoEntrada, nomeArquivoSaida);
+    sprintf(hoje,"%04d%02d%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+    printf("Data: %04d/%02d/%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 
-    printf("Arquivo de idades construído com sucesso!\n");
+    preencher(nome,&ano,&mes,&dia);
+
+    nomedata(nome,ano,mes,dia);
+
+    idade = calcidade(hoje,ano,mes,dia);
+
+    nomeidade(nome,idade);
+
+    leitura();
 
     return 0;
 }
