@@ -3,42 +3,42 @@
 
 #define tam 20
 
-int main(){
+int contador(char palavra[]){
 
-    FILE *arq;
+    int cont = 0, i;
 
-    char palavra[tam];
+    for(i = 0; palavra[i] != '\0'; i++){
+        if((palavra[i] >= 'a' && palavra[i] <= 'z') || (palavra[i] >= 'A' && palavra[i] <= 'Z')){
+            cont++;
+        }
+    }
+    return cont;
+}
 
-    arq = fopen("arq1.txt", "w");
+void arquivo(char palavra[], const char *nomeArquivo){
 
-    if(arq == NULL){
-        printf("Erro na abertura do arquivo!");
+    FILE *arquivo = fopen(nomeArquivo, "w");
+    
+    if(arquivo == NULL){
+        printf("Erro ao abrir o arquivo.\n");
         exit(1);
     }
+
+    fprintf(arquivo, "%s", palavra);
+    fclose(arquivo);
+}
+
+int main(){
+
+    char palavra[100];
 
     printf("Digite uma palavra: ");
     scanf("%s", palavra);
 
-    fprintf(arq, "%s", palavra);
+    arquivo(palavra, "palavra.txt");
 
-    fclose(arq);
-
-    fopen("arq1.txt", "r");
-
-    if(arq == NULL){
-        printf("Erro na abertura do arquivo!");
-        exit(1);
-    }
-
-    int i = 0;
-
-    while(palavra[i] != '\0'){
-        i++;
-    }
-
-    printf("A palavra possui %d letras", i);
-
-    fclose(arq);
+    int t = contador(palavra);
+    printf("A palavra tem %d letras.\n", t);
 
     return 0;
 }
